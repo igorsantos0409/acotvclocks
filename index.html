@@ -206,50 +206,47 @@
         setInterval(updateWeather, 600000);
 
         if (!googleAPIKey) {
-            console.error("API Key do Google não fornecida via URL!");
-            document.getElementById("eta").style.display="none";
+    console.error("API Key do Google não fornecida via URL!");
+} else {
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${googleAPIKey}&libraries=places`;
+    script.defer = true;
+    script.async = true;
+    document.head.appendChild(script);
 
-        } else {
-            // Cria o script do Google Maps dinamicamente
-            const script = document.createElement('script');
-            script.src = `https://maps.googleapis.com/maps/api/js?key=${googleAPIKey}&libraries=places`;
-            script.defer = true;
-            script.async = true;
-            document.head.appendChild(script);
+    script.onload = () => {
+        console.log("Google Maps API carregada!");
+        initETA(); // chama só quando a API estiver pronta
+    };
+}
 
-            script.onload = () => {
-                console.log("Google Maps API carregada com sucesso!");
-                initETA(); // inicializa função de ETA quando a API estiver pronta
-            };
-        }
+// Função que usa DistanceMatrixService
+function initETA() {
+    function updateETA() {
+        const origin = "Tecmaia, Maia, Portugal";
+        const destination = "Aeroporto Francisco Sá Carneiro, Porto, Portugal";
 
-        // Função de ETA usando DistanceMatrixService
-        function initETA() {
-            function updateETA() {
-                const origin = "Tecmaia, Maia, Portugal";
-                const destination = "Aeroporto Francisco Sá Carneiro, Porto, Portugal";
-
-                const service = new google.maps.DistanceMatrixService();
-                service.getDistanceMatrix({
-                    origins: [origin],
-                    destinations: [destination],
-                    travelMode: 'DRIVING',
-                    unitSystem: google.maps.UnitSystem.METRIC
-                }, (response, status) => {
-                    if (status !== 'OK') {
-                        console.error('Erro DistanceMatrix:', status);
-                        document.getElementById("eta").style.display="none";
-                        return;
-                    }
-                    const element = response.rows[0].elements[0];
-                    const duration = element.duration.text;
-                    document.getElementById("eta").textContent = `ETA: ${duration}`;
-                });
+        const service = new google.maps.DistanceMatrixService();
+        service.getDistanceMatrix({
+            origins: [origin],
+            destinations: [destination],
+            travelMode: 'DRIVING',
+            unitSystem: google.maps.UnitSystem.METRIC
+        }, (response, status) => {
+            if (status !== 'OK') {
+                console.error('Erro DistanceMatrix:', status);
+                document.getElementById("eta").textContent = "ETA: erro";
+                return;
             }
+            const element = response.rows[0].elements[0];
+            const duration = element.duration.text;
+            document.getElementById("eta").textContent = `ETA: ${duration}`;
+        });
+    }
 
-            updateETA();
-            setInterval(updateETA, 60000);
-        }
+    updateETA();
+    setInterval(updateETA, 60000); // atualiza a cada minuto
+}
     </script>
 
 </body>
