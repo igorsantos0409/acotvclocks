@@ -3,15 +3,7 @@
 
 <head>
     <meta charset="UTF-8" />
-    <!-- <meta http-equiv="Content-Security-Policy" content="
-    default-src 'self';
-    script-src 'self' 'unsafe-inline';
-    connect-src 'self' https://api.openweathermap.org https://maps.googleapis.com;
-    img-src 'self' https://openweathermap.org data:;
-    style-src 'self' 'unsafe-inline';
-"> -->
     <link id="theme-style" rel="stylesheet" href="style.css">
-
     <title>Relógios TV ACO</title>
 </head>
 
@@ -20,7 +12,6 @@
     <div class="top-bar">
         <div class="top-item" id="dateBox">--</div>
         <div class="top-item" id="weatherBox">Carregando...</div>
-
         <div class="top-item">
             <div id="logoBox">
                 <img src="aco-logo.svg" alt="Logo ACO" style="height: 75px; object-fit: contain;">
@@ -54,17 +45,27 @@
             <div class="label">Perú</div>
         </div>
     </div>
+
     <h3 id="eta">ETA: carregando...</h3>
 
     <script>
-        /*************************************
-         * Relógios Analógicos e Digitais
-         *************************************/
         const urlParams = new URLSearchParams(window.location.search);
         const isDarkMode = urlParams.get('darkMode') === '1';
-        if (isDarkMode) {
-            document.getElementById("theme-style").href = "dark.css";
-        }
+        if (isDarkMode) document.getElementById("theme-style").href = "dark.css";
+        const isDigital = urlParams.get('digital') === '1';
+        const apiKeyWeather = urlParams.get('apiKey');
+        const googleAPIKey = urlParams.get('apiKeyGoogle'); // opcional, para referência
+
+        /********** Relógios **********/
+        const countries = [
+            { id: 'clock-es', tz: 'Europe/Madrid', lb: 'Espanha' },
+            { id: 'clock-pt', tz: 'Europe/Lisbon', lb: 'Portugal' },
+            { id: 'clock-br', tz: 'America/Sao_Paulo', lb: 'Brasil' },
+            { id: 'clock-co', tz: 'America/Bogota', lb: 'Colombia' },
+            { id: 'clock-cl', tz: 'America/Santiago', lb: 'Chile' },
+            { id: 'clock-pe', tz: 'America/Lima', lb: 'Perú' }
+        ];
+
         function createAnalogClock(canvasId, timeZone) {
             const canvas = document.getElementById(canvasId);
             const ctx = canvas.getContext("2d");
@@ -98,42 +99,23 @@
 
             function drawFace(ctx, radius) {
                 ctx.beginPath();
-                if (isDarkMode) {
-                    ctx.arc(0, 0, radius * 0.95, 0, 2 * Math.PI);
-                    ctx.fillStyle = "#2d2d2d";
-                    ctx.fill();
+                ctx.arc(0, 0, radius * 0.95, 0, 2 * Math.PI);
+                ctx.fillStyle = isDarkMode ? "#2d2d2d" : "white";
+                ctx.fill();
+                ctx.strokeStyle = "#aaa";
+                ctx.lineWidth = 4;
+                ctx.stroke();
 
-                    ctx.strokeStyle = "#aaa";
-                    ctx.lineWidth = 4;
-                    ctx.stroke();
-
-                    ctx.beginPath();
-                    ctx.arc(0, 0, 6, 0, 2 * Math.PI);
-                    ctx.fillStyle = "#cccccc";
-                    ctx.fill();
-                }
-                else {
-                    ctx.beginPath();
-                    ctx.arc(0, 0, radius * 0.95, 0, 2 * Math.PI);
-                    ctx.fillStyle = "white";
-                    ctx.fill();
-
-                    ctx.strokeStyle = "#aaa";
-                    ctx.lineWidth = 4;
-                    ctx.stroke();
-
-                    ctx.beginPath();
-                    ctx.arc(0, 0, 6, 0, 2 * Math.PI);
-                    ctx.fillStyle = "#333";
-                    ctx.fill();
-                }
+                ctx.beginPath();
+                ctx.arc(0, 0, 6, 0, 2 * Math.PI);
+                ctx.fillStyle = isDarkMode ? "#ccc" : "#333";
+                ctx.fill();
             }
 
             function drawNumbers(ctx, radius) {
                 ctx.font = radius * 0.14 + "px -apple-system, sans-serif";
                 ctx.textBaseline = "middle";
                 ctx.textAlign = "center";
-
                 for (let num = 1; num <= 12; num++) {
                     let ang = num * Math.PI / 6;
                     ctx.rotate(ang);
@@ -162,58 +144,34 @@
 
         function createDigitalClock(containerId, timeZone, labelText) {
             const container = document.getElementById(containerId);
-
-            // Mantemos o conteúdo existente (incluindo a label)
-            container.innerHTML = ''; // apenas limpa canvas se existir
+            container.innerHTML = '';
             const digitalDiv = document.createElement('div');
             digitalDiv.className = 'digital-clock';
-            const digitalDivLabel = document.createElement('div');
-            digitalDivLabel.className = 'label';
-            digitalDivLabel.textContent = labelText;
-            container.style.alignContent = 'inline-block'
-            // Insere antes da label
-            const label = container.querySelector('.label');
-            if (label) container.insertBefore(digitalDiv, label, digitalDivLabel);
-            else container.appendChild(digitalDiv);
-            container.appendChild(digitalDivLabel);
+            const digitalLabel = document.createElement('div');
+            digitalLabel.className = 'label';
+            digitalLabel.textContent = labelText;
+            container.appendChild(digitalDiv);
+            container.appendChild(digitalLabel);
 
             function updateClock() {
                 const now = new Date();
                 const localeString = now.toLocaleString("en-US", { timeZone });
                 const date = new Date(localeString);
-                let hours = date.getHours().toString().padStart(2, '0');
-                let minutes = date.getMinutes().toString().padStart(2, '0');
-                let seconds = date.getSeconds().toString().padStart(2, '0');
+                const hours = date.getHours().toString().padStart(2, '0');
+                const minutes = date.getMinutes().toString().padStart(2, '0');
                 digitalDiv.textContent = `${hours} : ${minutes}`;
                 requestAnimationFrame(updateClock);
             }
             updateClock();
         }
 
-        // Checar URL para modo digital
-        const isDigital = urlParams.get('digital') === '1';
-
-        const countries = [
-            { id: 'clock-es', tz: 'Europe/Madrid', lb: 'Espanha' },
-            { id: 'clock-pt', tz: 'Europe/Lisbon', lb: 'Portugal' },
-            { id: 'clock-br', tz: 'America/Sao_Paulo', lb: 'Brasil' },
-            { id: 'clock-co', tz: 'America/Bogota', lb: 'Colombia' },
-            { id: 'clock-cl', tz: 'America/Santiago', lb: 'Chile' },
-            { id: 'clock-pe', tz: 'America/Lima', lb: 'Perú' }
-        ];
-
         countries.forEach(c => {
             const containerId = c.id + 'Container';
-            if (isDigital) {
-                createDigitalClock(containerId, c.tz, c.lb);
-            } else {
-                createAnalogClock(c.id, c.tz);
-            }
+            if (isDigital) createDigitalClock(containerId, c.tz, c.lb);
+            else createAnalogClock(c.id, c.tz);
         });
 
-        /*************************************
-         * Data e dia da semana
-         *************************************/
+        /********** Data **********/
         function updateDateBox() {
             const dateBox = document.getElementById("dateBox");
             const now = new Date();
@@ -222,85 +180,74 @@
         }
         updateDateBox();
 
-        /*************************************
-         * Meteorologia Maia (Porto) com ícone
-         *************************************/
-
-        const apiKey = urlParams.get('apiKey');
+        /********** Clima Maia **********/
         const city = 'Maia,PT';
         const weatherBox = document.getElementById('weatherBox');
 
         async function updateWeather() {
             try {
-                const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric&lang=pt`);
+                const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKeyWeather}&units=metric&lang=pt`);
                 const data = await res.json();
                 if (data.cod === 200) {
                     const temp = Math.round(data.main.temp);
                     const desc = data.weather[0].description;
                     const icon = data.weather[0].icon;
-                    console.log(icon);
-
                     weatherBox.innerHTML = `
-                <div>
-                    <img class="climad" src="${icon}.png" alt="Clima">
-                </div>
-                <div>
-                    ${city}: ${temp}°C
-                </div>
-            `;
-                } else {
-                    weatherBox.textContent = 'Não foi possível obter o clima';
-                }
+                        <div><img class="climad" src="http://openweathermap.org/img/wn/${icon}.png" alt="Clima"></div>
+                        <div>${city}: ${temp}°C</div>
+                    `;
+                } else weatherBox.textContent = 'Não foi possível obter o clima';
             } catch (err) {
                 console.error(err);
                 weatherBox.textContent = 'Erro ao obter o clima';
             }
         }
-
         updateWeather();
-        setInterval(updateWeather, 600000); // Atualiza a cada 10 minutos
-        async function updateETA() {
-            const origin = "Tecmaia, Maia, Portugal";
-            const destination = "Aeroporto Francisco Sá Carneiro, Porto, Portugal";
+        setInterval(updateWeather, 600000);
 
-            // 🔑 AQUI pões a tua API KEY
-            const API_KEY = urlParams.get('apiKeyGoogle');
+        if (!googleAPIKey) {
+            console.error("API Key do Google não fornecida via URL!");
+        } else {
+            // Cria o script do Google Maps dinamicamente
+            const script = document.createElement('script');
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${googleAPIKey}&libraries=places`;
+            script.defer = true;
+            script.async = true;
+            document.head.appendChild(script);
 
-            const url =
-                "https://maps.googleapis.com/maps/api/distancematrix/xml?" +
-                `origins=${encodeURIComponent(origin)}` +
-                `&destinations=${encodeURIComponent(destination)}` +
-                "&departure_time=now" +
-                "&traffic_model=best_guess" +
-                `&key=${API_KEY}`;
-
-            try {
-                const response = await fetch(url);
-                const xmlText = await response.text();
-
-                // Converte o XML para objeto DOM
-                const parser = new DOMParser();
-                const xml = parser.parseFromString(xmlText, "text/xml");
-
-                // duration_in_traffic -> <duration_in_traffic><text>15 mins</text></duration_in_traffic>
-                let durationNode = xml.querySelector("duration_in_traffic > text");
-
-                // fallback caso o Google não devolva traffic
-                if (!durationNode) {
-                    durationNode = xml.querySelector("duration > text");
-                }
-
-                const durationText = durationNode ? durationNode.textContent : "—";
-
-                document.getElementById("eta").textContent = `ETA: ${durationText}`;
-            } catch (err) {
-                console.error(err);
-                document.getElementById("eta").textContent = "ETA: erro";
-            }
+            script.onload = () => {
+                console.log("Google Maps API carregada com sucesso!");
+                initETA(); // inicializa função de ETA quando a API estiver pronta
+            };
         }
 
-        updateETA();
-        setInterval(updateETA, 60000); // atualiza a cada 1 minuto
+        // Função de ETA usando DistanceMatrixService
+        function initETA() {
+            function updateETA() {
+                const origin = "Tecmaia, Maia, Portugal";
+                const destination = "Aeroporto Francisco Sá Carneiro, Porto, Portugal";
+
+                const service = new google.maps.DistanceMatrixService();
+                service.getDistanceMatrix({
+                    origins: [origin],
+                    destinations: [destination],
+                    travelMode: 'DRIVING',
+                    unitSystem: google.maps.UnitSystem.METRIC
+                }, (response, status) => {
+                    if (status !== 'OK') {
+                        console.error('Erro DistanceMatrix:', status);
+                        document.getElementById("eta").textContent = "ETA: erro";
+                        return;
+                    }
+                    const element = response.rows[0].elements[0];
+                    const duration = element.duration.text;
+                    document.getElementById("eta").textContent = `ETA: ${duration}`;
+                });
+            }
+
+            updateETA();
+            setInterval(updateETA, 60000);
+        }
     </script>
 
 </body>
