@@ -53,6 +53,7 @@
             <div class="label">Perú</div>
         </div>
     </div>
+    <h3 id="eta">ETA: carregando...</h3>
 
     <script>
         /*************************************
@@ -60,7 +61,7 @@
          *************************************/
         const urlParams = new URLSearchParams(window.location.search);
         const isDarkMode = urlParams.get('darkMode') === '1';
-        if(isDarkMode){
+        if (isDarkMode) {
             document.getElementById("theme-style").href = "dark.css";
         }
         function createAnalogClock(canvasId, timeZone) {
@@ -257,6 +258,48 @@
 
         updateWeather();
         setInterval(updateWeather, 600000); // Atualiza a cada 10 minutos
+        async function updateETA() {
+            const origin = "Tecmaia, Maia, Portugal";
+            const destination = "Aeroporto Francisco Sá Carneiro, Porto, Portugal";
+
+            // 🔑 AQUI pões a tua API KEY
+            const API_KEY = urlParams.get('apiKeyGoogle');
+
+            const url =
+                "https://maps.googleapis.com/maps/api/distancematrix/xml?" +
+                `origins=${encodeURIComponent(origin)}` +
+                `&destinations=${encodeURIComponent(destination)}` +
+                "&departure_time=now" +
+                "&traffic_model=best_guess" +
+                `&key=${API_KEY}`;
+
+            try {
+                const response = await fetch(url);
+                const xmlText = await response.text();
+
+                // Converte o XML para objeto DOM
+                const parser = new DOMParser();
+                const xml = parser.parseFromString(xmlText, "text/xml");
+
+                // duration_in_traffic -> <duration_in_traffic><text>15 mins</text></duration_in_traffic>
+                let durationNode = xml.querySelector("duration_in_traffic > text");
+
+                // fallback caso o Google não devolva traffic
+                if (!durationNode) {
+                    durationNode = xml.querySelector("duration > text");
+                }
+
+                const durationText = durationNode ? durationNode.textContent : "—";
+
+                document.getElementById("eta").textContent = `ETA: ${durationText}`;
+            } catch (err) {
+                console.error(err);
+                document.getElementById("eta").textContent = "ETA: erro";
+            }
+        }
+
+        updateETA();
+        setInterval(updateETA, 60000); // atualiza a cada 1 minuto
     </script>
 
 </body>
