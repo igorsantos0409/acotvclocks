@@ -207,6 +207,8 @@
 
         if (!googleAPIKey) {
             console.error("API Key do Google não fornecida via URL!");
+            document.getElementById("eta").style.display="none";
+
         } else {
             // Cria o script do Google Maps dinamicamente
             const script = document.createElement('script');
@@ -236,7 +238,7 @@
                 }, (response, status) => {
                     if (status !== 'OK') {
                         console.error('Erro DistanceMatrix:', status);
-                        document.getElementById("eta").textContent = "ETA: erro";
+                        document.getElementById("eta").style.display="none";
                         return;
                     }
                     const element = response.rows[0].elements[0];
