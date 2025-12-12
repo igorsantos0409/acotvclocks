@@ -204,7 +204,7 @@
     /********** ETA via Cloudflare Worker **********/
     async function updateETA() {
         try {
-            const res = await fetch("https://teu-worker.workers.dev/?key="+googleAPIKey);
+            const res = await fetch("https://muddy-sky-8ac4.igorsantos0409.workers.dev/?key="+googleAPIKey);
             const data = await res.json();
 
             if (data.eta) {
