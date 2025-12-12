@@ -209,7 +209,7 @@
             const data = await res.json();
 
             if (data.eta) {
-                document.getElementById("eta").textContent = `ETA: ${data.eta}`;
+                document.getElementById("eta").textContent = `ETA: ${data.eta_com_transito}`;
             } else {
                 document.getElementById("eta").textContent = "ETA: indisponível";
             }
