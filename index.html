@@ -208,8 +208,8 @@
             const res = await fetch("https://muddy-sky-8ac4.igorsantos0409.workers.dev/?key="+googleAPIKey);
             const data = await res.json();
 
-            if (data.eta) {
-                document.getElementById("eta").textContent = `ETA: ${data}`;
+            if (data.eta_com_transito) {
+                document.getElementById("eta").textContent = `ETA: ${data.eta_com_transito}`;
             } else {
                 document.getElementById("eta").textContent = "ETA: indisponível";
             }
