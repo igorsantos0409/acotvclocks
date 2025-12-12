@@ -46,208 +46,181 @@
         </div>
     </div>
 
-    <h3 id="eta">ETA: carregando...</h3>
+   <h3 id="eta">ETA: carregando...</h3>
 
-    <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const isDarkMode = urlParams.get('darkMode') === '1';
-        if (isDarkMode) document.getElementById("theme-style").href = "dark.css";
-        const isDigital = urlParams.get('digital') === '1';
-        const apiKeyWeather = urlParams.get('apiKey');
-        const googleAPIKey = urlParams.get('apiKeyGoogle'); // opcional, para referência
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const isDarkMode = urlParams.get('darkMode') === '1';
+    const googleAPIKey = urlParams.get('googleAPIKey');
+    if (isDarkMode) document.getElementById("theme-style").href = "dark.css";
+    const isDigital = urlParams.get('digital') === '1';
+    const apiKeyWeather = urlParams.get('apiKey');
 
-        /********** Relógios **********/
-        const countries = [
-            { id: 'clock-es', tz: 'Europe/Madrid', lb: 'Espanha' },
-            { id: 'clock-pt', tz: 'Europe/Lisbon', lb: 'Portugal' },
-            { id: 'clock-br', tz: 'America/Sao_Paulo', lb: 'Brasil' },
-            { id: 'clock-co', tz: 'America/Bogota', lb: 'Colombia' },
-            { id: 'clock-cl', tz: 'America/Santiago', lb: 'Chile' },
-            { id: 'clock-pe', tz: 'America/Lima', lb: 'Perú' }
-        ];
+    /********** Relógios **********/
+    const countries = [
+        { id: 'clock-es', tz: 'Europe/Madrid', lb: 'Espanha' },
+        { id: 'clock-pt', tz: 'Europe/Lisbon', lb: 'Portugal' },
+        { id: 'clock-br', tz: 'America/Sao_Paulo', lb: 'Brasil' },
+        { id: 'clock-co', tz: 'America/Bogota', lb: 'Colombia' },
+        { id: 'clock-cl', tz: 'America/Santiago', lb: 'Chile' },
+        { id: 'clock-pe', tz: 'America/Lima', lb: 'Perú' }
+    ];
 
-        function createAnalogClock(canvasId, timeZone) {
-            const canvas = document.getElementById(canvasId);
-            const ctx = canvas.getContext("2d");
-            const radius = canvas.height / 2;
-            ctx.translate(radius, radius);
+    function createAnalogClock(canvasId, timeZone) {
+        const canvas = document.getElementById(canvasId);
+        const ctx = canvas.getContext("2d");
+        const radius = canvas.height / 2;
+        ctx.translate(radius, radius);
 
-            function drawClock() {
-                drawFace(ctx, radius);
-                drawNumbers(ctx, radius);
-                drawTimeSmooth(ctx, radius);
-                requestAnimationFrame(drawClock);
-            }
-
-            function getLocalDate() {
-                const now = new Date();
-                const localeString = now.toLocaleString("en-US", { timeZone });
-                return new Date(localeString);
-            }
-
-            function drawTimeSmooth(ctx, radius) {
-                const now = getLocalDate();
-                const ms = now.getMilliseconds();
-                const sec = now.getSeconds() + ms / 1000;
-                const min = now.getMinutes() + sec / 60;
-                const hr = (now.getHours() % 12) + min / 60;
-
-                drawHand(ctx, (hr * Math.PI) / 6, radius * 0.5, 6);
-                drawHand(ctx, (min * Math.PI) / 30, radius * 0.75, 4);
-                drawHand(ctx, (sec * Math.PI) / 30, radius * 0.85, 2);
-            }
-
-            function drawFace(ctx, radius) {
-                ctx.beginPath();
-                ctx.arc(0, 0, radius * 0.95, 0, 2 * Math.PI);
-                ctx.fillStyle = isDarkMode ? "#2d2d2d" : "white";
-                ctx.fill();
-                ctx.strokeStyle = "#aaa";
-                ctx.lineWidth = 4;
-                ctx.stroke();
-
-                ctx.beginPath();
-                ctx.arc(0, 0, 6, 0, 2 * Math.PI);
-                ctx.fillStyle = isDarkMode ? "#ccc" : "#333";
-                ctx.fill();
-            }
-
-            function drawNumbers(ctx, radius) {
-                ctx.font = radius * 0.14 + "px -apple-system, sans-serif";
-                ctx.textBaseline = "middle";
-                ctx.textAlign = "center";
-                for (let num = 1; num <= 12; num++) {
-                    let ang = num * Math.PI / 6;
-                    ctx.rotate(ang);
-                    ctx.translate(0, -radius * 0.78);
-                    ctx.rotate(-ang);
-                    ctx.fillText(num, 0, 0);
-                    ctx.rotate(ang);
-                    ctx.translate(0, radius * 0.78);
-                    ctx.rotate(-ang);
-                }
-            }
-
-            function drawHand(ctx, pos, length, width) {
-                ctx.beginPath();
-                ctx.lineWidth = width;
-                ctx.lineCap = "round";
-                ctx.moveTo(0, 0);
-                ctx.rotate(pos);
-                ctx.lineTo(0, -length);
-                ctx.stroke();
-                ctx.rotate(-pos);
-            }
-
+        function drawClock() {
+            drawFace(ctx, radius);
+            drawNumbers(ctx, radius);
+            drawTimeSmooth(ctx, radius);
             requestAnimationFrame(drawClock);
         }
 
-        function createDigitalClock(containerId, timeZone, labelText) {
-            const container = document.getElementById(containerId);
-            container.innerHTML = '';
-            const digitalDiv = document.createElement('div');
-            digitalDiv.className = 'digital-clock';
-            const digitalLabel = document.createElement('div');
-            digitalLabel.className = 'label';
-            digitalLabel.textContent = labelText;
-            container.appendChild(digitalDiv);
-            container.appendChild(digitalLabel);
-
-            function updateClock() {
-                const now = new Date();
-                const localeString = now.toLocaleString("en-US", { timeZone });
-                const date = new Date(localeString);
-                const hours = date.getHours().toString().padStart(2, '0');
-                const minutes = date.getMinutes().toString().padStart(2, '0');
-                digitalDiv.textContent = `${hours} : ${minutes}`;
-                requestAnimationFrame(updateClock);
-            }
-            updateClock();
-        }
-
-        countries.forEach(c => {
-            const containerId = c.id + 'Container';
-            if (isDigital) createDigitalClock(containerId, c.tz, c.lb);
-            else createAnalogClock(c.id, c.tz);
-        });
-
-        /********** Data **********/
-        function updateDateBox() {
-            const dateBox = document.getElementById("dateBox");
+        function getLocalDate() {
             const now = new Date();
-            const options = { weekday: 'long', year: 'numeric', month: 'numeric', day: 'numeric' };
-            dateBox.textContent = now.toLocaleDateString('pt-PT', options);
+            const localeString = now.toLocaleString("en-US", { timeZone });
+            return new Date(localeString);
         }
-        updateDateBox();
 
-        /********** Clima Maia **********/
-        const city = 'Maia,PT';
-        const weatherBox = document.getElementById('weatherBox');
+        function drawTimeSmooth(ctx, radius) {
+            const now = getLocalDate();
+            const ms = now.getMilliseconds();
+            const sec = now.getSeconds() + ms / 1000;
+            const min = now.getMinutes() + sec / 60;
+            const hr = (now.getHours() % 12) + min / 60;
 
-        async function updateWeather() {
-            try {
-                const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKeyWeather}&units=metric&lang=pt`);
-                const data = await res.json();
-                if (data.cod === 200) {
-                    const temp = Math.round(data.main.temp);
-                    const desc = data.weather[0].description;
-                    const icon = data.weather[0].icon;
-                    weatherBox.innerHTML = `
-                        <div><img class="climad" src="http://openweathermap.org/img/wn/${icon}.png" alt="Clima"></div>
-                        <div>${city}: ${temp}°C</div>
-                    `;
-                } else weatherBox.textContent = 'Não foi possível obter o clima';
-            } catch (err) {
-                console.error(err);
-                weatherBox.textContent = 'Erro ao obter o clima';
+            drawHand(ctx, (hr * Math.PI) / 6, radius * 0.5, 6);
+            drawHand(ctx, (min * Math.PI) / 30, radius * 0.75, 4);
+            drawHand(ctx, (sec * Math.PI) / 30, radius * 0.85, 2);
+        }
+
+        function drawFace(ctx, radius) {
+            ctx.beginPath();
+            ctx.arc(0, 0, radius * 0.95, 0, 2 * Math.PI);
+            ctx.fillStyle = isDarkMode ? "#2d2d2d" : "white";
+            ctx.fill();
+            ctx.strokeStyle = "#aaa";
+            ctx.lineWidth = 4;
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(0, 0, 6, 0, 2 * Math.PI);
+            ctx.fillStyle = isDarkMode ? "#ccc" : "#333";
+            ctx.fill();
+        }
+
+        function drawNumbers(ctx, radius) {
+            ctx.font = radius * 0.14 + "px -apple-system, sans-serif";
+            ctx.textBaseline = "middle";
+            ctx.textAlign = "center";
+            for (let num = 1; num <= 12; num++) {
+                let ang = num * Math.PI / 6;
+                ctx.rotate(ang);
+                ctx.translate(0, -radius * 0.78);
+                ctx.rotate(-ang);
+                ctx.fillText(num, 0, 0);
+                ctx.rotate(ang);
+                ctx.translate(0, radius * 0.78);
+                ctx.rotate(-ang);
             }
         }
-        updateWeather();
-        setInterval(updateWeather, 600000);
 
-        if (!googleAPIKey) {
-    console.error("API Key do Google não fornecida via URL!");
-} else {
-    const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${googleAPIKey}&libraries=places`;
-    script.defer = true;
-    script.async = true;
-    document.head.appendChild(script);
+        function drawHand(ctx, pos, length, width) {
+            ctx.beginPath();
+            ctx.lineWidth = width;
+            ctx.lineCap = "round";
+            ctx.moveTo(0, 0);
+            ctx.rotate(pos);
+            ctx.lineTo(0, -length);
+            ctx.stroke();
+            ctx.rotate(-pos);
+        }
 
-    script.onload = () => {
-        console.log("Google Maps API carregada!");
-        initETA(); // chama só quando a API estiver pronta
-    };
-}
+        requestAnimationFrame(drawClock);
+    }
 
-// Função que usa DistanceMatrixService
-function initETA() {
-    function updateETA() {
-        const origin = "Tecmaia, Maia, Portugal";
-        const destination = "Aeroporto Francisco Sá Carneiro, Porto, Portugal";
+    function createDigitalClock(containerId, timeZone, labelText) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+        const digitalDiv = document.createElement('div');
+        digitalDiv.className = 'digital-clock';
+        const digitalLabel = document.createElement('div');
+        digitalLabel.className = 'label';
+        digitalLabel.textContent = labelText;
+        container.appendChild(digitalDiv);
+        container.appendChild(digitalLabel);
 
-        const service = new google.maps.DistanceMatrixService();
-        service.getDistanceMatrix({
-            origins: [origin],
-            destinations: [destination],
-            travelMode: 'DRIVING',
-            unitSystem: google.maps.UnitSystem.METRIC
-        }, (response, status) => {
-            if (status !== 'OK') {
-                console.error('Erro DistanceMatrix:', status);
-                document.getElementById("eta").textContent = "ETA: erro";
-                return;
+        function updateClock() {
+            const now = new Date();
+            const localeString = now.toLocaleString("en-US", { timeZone });
+            const date = new Date(localeString);
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            digitalDiv.textContent = `${hours} : ${minutes}`;
+            requestAnimationFrame(updateClock);
+        }
+        updateClock();
+    }
+
+    countries.forEach(c => {
+        const containerId = c.id + 'Container';
+        if (isDigital) createDigitalClock(containerId, c.tz, c.lb);
+        else createAnalogClock(c.id, c.tz);
+    });
+
+    /********** Data **********/
+    function updateDateBox() {
+        const dateBox = document.getElementById("dateBox");
+        const now = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'numeric', day: 'numeric' };
+        dateBox.textContent = now.toLocaleDateString('pt-PT', options);
+    }
+    updateDateBox();
+
+    /********** Clima **********/
+    async function updateWeather() {
+        try {
+            const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=Maia,PT&appid=${apiKeyWeather}&units=metric&lang=pt`);
+            const data = await res.json();
+            if (data.cod === 200) {
+                const temp = Math.round(data.main.temp);
+                const desc = data.weather[0].description;
+                const icon = data.weather[0].icon;
+                weatherBox.innerHTML = `
+                    <div><img class="climad" src="http://openweathermap.org/img/wn/${icon}.png"></div>
+                    <div>Maia: ${temp}°C</div>
+                `;
+            } else weatherBox.textContent = 'Não foi possível obter o clima';
+        } catch (err) {
+            weatherBox.textContent = 'Erro ao obter o clima';
+        }
+    }
+    updateWeather();
+    setInterval(updateWeather, 600000);
+
+    /********** ETA via Cloudflare Worker **********/
+    async function updateETA() {
+        try {
+            const res = await fetch("https://teu-worker.workers.dev/?key="+googleAPIKey);
+            const data = await res.json();
+
+            if (data.eta) {
+                document.getElementById("eta").textContent = `ETA: ${data.eta}`;
+            } else {
+                document.getElementById("eta").textContent = "ETA: indisponível";
             }
-            const element = response.rows[0].elements[0];
-            const duration = element.duration.text;
-            document.getElementById("eta").textContent = `ETA: ${duration}`;
-        });
+        } catch (err) {
+            document.getElementById("eta").textContent = "ETA: erro";
+        }
     }
 
     updateETA();
-    setInterval(updateETA, 60000); // atualiza a cada minuto
-}
-    </script>
+    setInterval(updateETA, 60000);
+</script>
+
 
 </body>
 
