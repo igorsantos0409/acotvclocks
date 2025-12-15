@@ -1,93 +1,117 @@
+:root {
+    --scale: min(1vw, 1vh);
+}
+
 html, body {
     margin: 0;
     height: 100%;
 }
-        body {
-            background: #e5e5e7;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            display: grid;
-            grid-template-rows: 80px  1fr;
-            grid-template-areas: "top-bar"
-                                 
-                                 "grid";
-            align-items: center;
-            margin-top: 0;
-        }
-        .climad {
-        bottom: 0;
-        filter: drop-shadow(0 6px 10px rgb(0, 0, 0));
-        }
-        /* Top Bar */
-        .top-bar {
-            margin-top: 0;
-            width: 100%;
-            height: 75px;
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            background: #f9f9fa;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            grid-area: "top-bar";
-        }
 
-        .top-item {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 24px;
-            font-weight: 600;
-        }
+body {
+    background: #e5e5e7;
+    font-family: system-ui, sans-serif;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+}
 
-        /* Clock Grid */
-        .grid {
-            display: grid;
+/* TOP BAR */
+.top-bar {
+    height: 8vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    background: #f9f9fa;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+}
 
-            grid-template-columns: 1fr 1fr 1fr;
-            grid-template-rows: 1fr 1fr;
-            height: calc(100%);
-            grid-area: "grid";
+.top-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: calc(2.2 * var(--scale));
+    font-weight: 600;
+}
 
-        }
+.logo {
+    height: 6vh;
+}
 
-        .clock-container {
-            text-align: center;
-            margin-top: 100px;
-            margin-left: 100px;
-            margin-right: 100px;
-        }
+/* CLOCK LAYOUT */
+#clockContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 4vh;
+    justify-content: center;
+    align-items: center;
+}
 
-        canvas {
-            height: 300px;
-            background: #fff;
-            border-radius: 50%;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-        }
+/* ROWS */
+.clock-row {
+    display: flex;
+    justify-content: center;
+    gap: 4vw;
+}
 
-        .label {
-            color: #353535;
-            margin-top: 12px;
-            font-size: 24px;
-            font-weight: 500;
-        }
+/* CONTAINERS */
+.clock-container {
+    text-align: center;
+}
 
-        .digital-clock {
-            font-size: 48px;
-            margin-top: 100px;
-            font-weight: 600;
-            color: #333;
-            background: #fff;
-            padding: 40px 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-            text-align: center;
-        }
+/* SIZES */
+.clock-container.big canvas {
+    width: 26vh;
+    height: 26vh;
+}
 
-        /* Weather Box */
-        #weatherBox img {
-            vertical-align: middle;
-            height: 40px;
-            margin-right: 8px;
-        }
-        #eta{
-            color: #444;
-            padding-left:5px;
-        }
+.clock-container.small canvas {
+    width: 18vh;
+    height: 18vh;
+}
+
+/* CANVAS */
+canvas {
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.2);
+}
+
+/* LABEL */
+.label {
+    margin-top: 1vh;
+    font-size: calc(2 * var(--scale));
+    font-weight: 500;
+}
+
+/* ETA */
+#eta {
+    text-align: center;
+    padding: 1vh;
+    font-size: calc(1.8 * var(--scale));
+}
+
+/* ANIMATION */
+.animate {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeUp 1s ease forwards;
+}
+
+.animate:nth-child(1) { animation-delay: 0.2s; }
+.animate:nth-child(2) { animation-delay: 0.4s; }
+.animate:nth-child(3) { animation-delay: 0.6s; }
+.animate:nth-child(4) { animation-delay: 0.8s; }
+.animate:nth-child(5) { animation-delay: 1s; }
+
+@keyframes fadeUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* VERTICAL TV */
+@media (orientation: portrait) {
+    .clock-row {
+        flex-direction: column;
+        gap: 3vh;
+    }
+}
