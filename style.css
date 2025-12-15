@@ -50,10 +50,72 @@ html, body {
 
         .clock-container {
             text-align: center;
-            margin-top: 100px;
+            /* margin-top: 30px; */
+            margin-bottom: 30px;
             margin-left: 100px;
             margin-right: 100px;
+            
         }
+
+        .clock-container-small {
+            text-align: center;
+            margin-top: 30px;
+            margin-left: 30px;
+            margin-right: 30px;
+            
+        }
+
+        #clockContainer{
+            display: grid;
+            grid-template-rows: auto auto;
+            grid-template-areas: "topRow"
+                                "botRow";
+        }
+        .ptContainer{
+            grid-area: portu;
+        }
+
+        .esContainer{
+            grid-area: espan;
+        }
+
+        .clock-row-up{
+            grid-area: topRow;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr ;
+            grid-template-areas: 
+            ". portu espan .";
+            
+        }
+        .clock-row-down{
+            grid-area: botRow;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+            grid-template-areas: 
+            "bras chil colom per arge";
+        }
+
+        .clContainer{
+            grid-area: chil;
+        }
+
+        .coContainer{
+            grid-area: colom;
+        }
+
+        .peContainer{
+            grid-area: per;
+        }
+
+        .arContainer{
+            grid-area: arge;
+        }
+
+        .brContainer{
+            grid-area: bras;
+        }
+
+        
 
         canvas {
             height: 300px;
@@ -68,7 +130,12 @@ html, body {
             font-size: 24px;
             font-weight: 500;
         }
-
+        .label-big{
+            color: #353535;
+            margin-top: 12px;
+            font-size: 40px;
+            font-weight: 500;
+        }
         .digital-clock {
             font-size: 48px;
             margin-top: 100px;
