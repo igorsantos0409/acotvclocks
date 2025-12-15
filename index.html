@@ -100,7 +100,7 @@
         function drawFace(ctx, radius) {
             ctx.beginPath();
             ctx.arc(0, 0, radius * 0.95, 0, 2 * Math.PI);
-            ctx.fillStyle = isDarkMode ? "#2d2d2d" : "white";
+            ctx.fillStyle = "white";
             ctx.fill();
             ctx.strokeStyle = "#aaa";
             ctx.lineWidth = 4;
@@ -108,7 +108,7 @@
 
             ctx.beginPath();
             ctx.arc(0, 0, 6, 0, 2 * Math.PI);
-            ctx.fillStyle = isDarkMode ? "#ccc" : "#333";
+            ctx.fillStyle =  "#333";
             ctx.fill();
         }
 
