@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt">
-
 <head>
     <meta charset="UTF-8" />
     <link id="theme-style" rel="stylesheet" href="style.css">
@@ -13,49 +12,49 @@
     <div class="top-item" id="dateBox">--</div>
     <div class="top-item" id="weatherBox">Carregando...</div>
     <div class="top-item">
-        <img src="aco-logo.svg" alt="Logo ACO" class="logo">
+        <img src="aco-logo.svg" alt="Logo ACO" style="height:75px">
     </div>
 </div>
 
 <div id="clockContainer">
 
-    <!-- Linha superior -->
-    <div class="clock-row top-row">
-        <div class="clock-container big animate" id="clock-ptContainer">
-            <canvas id="clock-pt" width="260" height="260"></canvas>
+    <!-- LINHA DE CIMA -->
+    <div class="clock-row">
+        <div class="clock-container big" id="clock-ptContainer">
+            <canvas id="clock-pt" width="300" height="300"></canvas>
             <div class="label">Portugal</div>
         </div>
 
-        <div class="clock-container big animate" id="clock-esContainer">
-            <canvas id="clock-es" width="260" height="260"></canvas>
+        <div class="clock-container big" id="clock-esContainer">
+            <canvas id="clock-es" width="300" height="300"></canvas>
             <div class="label">Espanha</div>
         </div>
     </div>
 
-    <!-- Linha inferior -->
-    <div class="clock-row bottom-row">
-        <div class="clock-container small animate" id="clock-brContainer">
-            <canvas id="clock-br" width="180" height="180"></canvas>
+    <!-- LINHA DE BAIXO -->
+    <div class="clock-row">
+        <div class="clock-container" id="clock-brContainer">
+            <canvas id="clock-br" width="200" height="200"></canvas>
             <div class="label">Brasil</div>
         </div>
 
-        <div class="clock-container small animate" id="clock-clContainer">
-            <canvas id="clock-cl" width="180" height="180"></canvas>
+        <div class="clock-container" id="clock-clContainer">
+            <canvas id="clock-cl" width="200" height="200"></canvas>
             <div class="label">Chile</div>
         </div>
 
-        <div class="clock-container small animate" id="clock-coContainer">
-            <canvas id="clock-co" width="180" height="180"></canvas>
+        <div class="clock-container" id="clock-coContainer">
+            <canvas id="clock-co" width="200" height="200"></canvas>
             <div class="label">Colombia</div>
         </div>
 
-        <div class="clock-container small animate" id="clock-peContainer">
-            <canvas id="clock-pe" width="180" height="180"></canvas>
+        <div class="clock-container" id="clock-peContainer">
+            <canvas id="clock-pe" width="200" height="200"></canvas>
             <div class="label">Perú</div>
         </div>
 
-        <div class="clock-container small animate" id="clock-arContainer">
-            <canvas id="clock-ar" width="180" height="180"></canvas>
+        <div class="clock-container" id="clock-arContainer">
+            <canvas id="clock-ar" width="200" height="200"></canvas>
             <div class="label">Argentina</div>
         </div>
     </div>
@@ -65,92 +64,181 @@
 <h3 id="eta">ETA: carregando...</h3>
 
 <script>
-const urlParams = new URLSearchParams(window.location.search);
-if (urlParams.get('darkMode') === '1')
-    document.getElementById("theme-style").href = "dark.css";
+    const urlParams = new URLSearchParams(window.location.search);
+    const isDarkMode = urlParams.get('darkMode') === '1';
+    
+    if (isDarkMode) document.getElementById("theme-style").href = "dark.css";
+    const isDigital = urlParams.get('digital') === '1';
+    const apiKeyWeather = urlParams.get('apiKey');
 
-const isDigital = urlParams.get('digital') === '1';
-
-const countries = [
-    { id: 'clock-pt', tz: 'Europe/Lisbon', lb: 'Portugal' },
-    { id: 'clock-es', tz: 'Europe/Madrid', lb: 'Espanha' },
-    { id: 'clock-br', tz: 'America/Sao_Paulo', lb: 'Brasil' },
-    { id: 'clock-cl', tz: 'America/Santiago', lb: 'Chile' },
-    { id: 'clock-co', tz: 'America/Bogota', lb: 'Colombia' },
-    { id: 'clock-pe', tz: 'America/Lima', lb: 'Perú' },
-    { id: 'clock-ar', tz: 'America/Argentina/Buenos_Aires', lb: 'Argentina' }
+    /********** Relógios **********/
+    const countries = [
+    { id:'clock-pt', tz:'Europe/Lisbon', lb:'Portugal' },
+    { id:'clock-es', tz:'Europe/Madrid', lb:'Espanha' },
+    { id:'clock-br', tz:'America/Sao_Paulo', lb:'Brasil' },
+    { id:'clock-cl', tz:'America/Santiago', lb:'Chile' },
+    { id:'clock-co', tz:'America/Bogota', lb:'Colombia' },
+    { id:'clock-pe', tz:'America/Lima', lb:'Perú' },
+    { id:'clock-ar', tz:'America/Argentina/Buenos_Aires', lb:'Argentina' }
 ];
 
-function createAnalogClock(canvasId, timeZone) {
-    const canvas = document.getElementById(canvasId);
-    const ctx = canvas.getContext("2d");
-    const r = canvas.height / 2;
-    ctx.translate(r, r);
+    function createAnalogClock(canvasId, timeZone) {
+        const canvas = document.getElementById(canvasId);
+        const ctx = canvas.getContext("2d");
+        const radius = canvas.height / 2;
+        ctx.translate(radius, radius);
 
-    function nowTZ() {
-        return new Date(new Date().toLocaleString("en-US", { timeZone }));
+        function drawClock() {
+            drawFace(ctx, radius);
+            drawNumbers(ctx, radius);
+            drawTimeSmooth(ctx, radius);
+            requestAnimationFrame(drawClock);
+        }
+
+        function getLocalDate() {
+            const now = new Date();
+            const localeString = now.toLocaleString("en-US", { timeZone });
+            return new Date(localeString);
+        }
+
+        function drawTimeSmooth(ctx, radius) {
+            const now = getLocalDate();
+            const ms = now.getMilliseconds();
+            const sec = now.getSeconds() + ms / 1000;
+            const min = now.getMinutes() + sec / 60;
+            const hr = (now.getHours() % 12) + min / 60;
+
+            drawHand(ctx, (hr * Math.PI) / 6, radius * 0.5, 6);
+            drawHand(ctx, (min * Math.PI) / 30, radius * 0.75, 4);
+            drawHand(ctx, (sec * Math.PI) / 30, radius * 0.85, 2);
+        }
+
+        function drawFace(ctx, radius) {
+            ctx.beginPath();
+            ctx.arc(0, 0, radius * 0.95, 0, 2 * Math.PI);
+            ctx.fillStyle = "white";
+            ctx.fill();
+            ctx.strokeStyle = "#aaa";
+            ctx.lineWidth = 4;
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(0, 0, 6, 0, 2 * Math.PI);
+            ctx.fillStyle =  "#333";
+            ctx.fill();
+        }
+
+        function drawNumbers(ctx, radius) {
+            ctx.font = radius * 0.14 + "px -apple-system, sans-serif";
+            ctx.textBaseline = "middle";
+            ctx.textAlign = "center";
+            for (let num = 1; num <= 12; num++) {
+                let ang = num * Math.PI / 6;
+                ctx.rotate(ang);
+                ctx.translate(0, -radius * 0.78);
+                ctx.rotate(-ang);
+                ctx.fillText(num, 0, 0);
+                ctx.rotate(ang);
+                ctx.translate(0, radius * 0.78);
+                ctx.rotate(-ang);
+            }
+        }
+
+        function drawHand(ctx, pos, length, width) {
+            ctx.beginPath();
+            ctx.lineWidth = width;
+            ctx.lineCap = "round";
+            ctx.moveTo(0, 0);
+            ctx.rotate(pos);
+            ctx.lineTo(0, -length);
+            ctx.stroke();
+            ctx.rotate(-pos);
+        }
+
+        requestAnimationFrame(drawClock);
     }
 
-    function draw() {
-        ctx.clearRect(-r, -r, canvas.width, canvas.height);
-        face(); numbers(); time();
-        requestAnimationFrame(draw);
+    function createDigitalClock(containerId, timeZone, labelText) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+        const digitalDiv = document.createElement('div');
+        digitalDiv.className = 'digital-clock';
+        const digitalLabel = document.createElement('div');
+        digitalLabel.className = 'label';
+        digitalLabel.textContent = labelText;
+        container.appendChild(digitalDiv);
+        container.appendChild(digitalLabel);
+
+        function updateClock() {
+            const now = new Date();
+            const localeString = now.toLocaleString("en-US", { timeZone });
+            const date = new Date(localeString);
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            digitalDiv.textContent = `${hours} : ${minutes}`;
+            requestAnimationFrame(updateClock);
+        }
+        updateClock();
     }
 
-    function face() {
-        ctx.beginPath();
-        ctx.arc(0, 0, r * 0.95, 0, Math.PI * 2);
-        ctx.fillStyle = "#fff";
-        ctx.fill();
-        ctx.lineWidth = 4;
-        ctx.strokeStyle = "#aaa";
-        ctx.stroke();
-    }
+    countries.forEach(c => {
+        const containerId = c.id + 'Container';
+        if (isDigital) createDigitalClock(containerId, c.tz, c.lb);
+        else createAnalogClock(c.id, c.tz);
+    });
 
-    function numbers() {
-        ctx.font = r * 0.14 + "px sans-serif";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        for (let i = 1; i <= 12; i++) {
-            const a = i * Math.PI / 6;
-            ctx.rotate(a);
-            ctx.translate(0, -r * 0.78);
-            ctx.rotate(-a);
-            ctx.fillText(i, 0, 0);
-            ctx.rotate(a);
-            ctx.translate(0, r * 0.78);
-            ctx.rotate(-a);
+    /********** Data **********/
+    function updateDateBox() {
+        const dateBox = document.getElementById("dateBox");
+        const now = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'numeric', day: 'numeric' };
+        dateBox.textContent = now.toLocaleDateString('pt-PT', options);
+    }
+    updateDateBox();
+
+    /********** Clima **********/
+    async function updateWeather() {
+        try {
+            const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=Maia,PT&appid=${apiKeyWeather}&units=metric&lang=pt`);
+            const data = await res.json();
+            if (data.cod === 200) {
+                const temp = Math.round(data.main.temp);
+                const desc = data.weather[0].description;
+                const icon = data.weather[0].icon;
+                weatherBox.innerHTML = `
+                    <div><img class="climad" src="http://openweathermap.org/img/wn/${icon}.png"></div>
+                    <div>Maia: ${temp}°C</div>
+                `;
+            } else weatherBox.textContent = 'Não foi possível obter o clima';
+        } catch (err) {
+            weatherBox.textContent = 'Erro ao obter o clima';
+        }
+    }
+    updateWeather();
+    setInterval(updateWeather, 600000);
+
+    /********** ETA via Cloudflare Worker **********/
+    async function updateETA() {
+        try {
+            const googleAPIKey = urlParams.get('apiKeyGoogle');
+            const res = await fetch("https://muddy-sky-8ac4.igorsantos0409.workers.dev/?key="+googleAPIKey);
+            const data = await res.json();
+
+            if (data.eta_com_transito) {
+                document.getElementById("eta").textContent = `ETA: ${data.eta_com_transito}`;
+            } else {
+                document.getElementById("eta").textContent = "ETA: indisponível";
+            }
+        } catch (err) {
+            document.getElementById("eta").textContent = "ETA: erro";
         }
     }
 
-    function time() {
-        const d = nowTZ();
-        const s = d.getSeconds() + d.getMilliseconds() / 1000;
-        const m = d.getMinutes() + s / 60;
-        const h = (d.getHours() % 12) + m / 60;
-        hand(h * Math.PI / 6, r * 0.5, 6);
-        hand(m * Math.PI / 30, r * 0.75, 4);
-        hand(s * Math.PI / 30, r * 0.85, 2);
-    }
-
-    function hand(p, l, w) {
-        ctx.beginPath();
-        ctx.lineWidth = w;
-        ctx.lineCap = "round";
-        ctx.rotate(p);
-        ctx.moveTo(0, 0);
-        ctx.lineTo(0, -l);
-        ctx.stroke();
-        ctx.rotate(-p);
-    }
-
-    draw();
-}
-
-countries.forEach(c => {
-    if (!isDigital) createAnalogClock(c.id, c.tz);
-});
+    updateETA();
+    setInterval(updateETA, 60000);
 </script>
 
+
 </body>
+
 </html>

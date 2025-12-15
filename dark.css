@@ -1,146 +1,97 @@
-:root {
-    --scale: min(1vw, 1vh);
-}
-
-html, body {
+html,
+body {
     margin: 0;
     height: 100%;
 }
 
 body {
-    background: #1e1e1e;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
-        Roboto, Helvetica, Arial, sans-serif;
+    background: #6e6e6e;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     display: grid;
-    grid-template-rows: auto 1fr auto;
-    color: #e0e0e0;
-}
+    grid-template-rows: 80px 1fr;
+    grid-template-areas: "top-bar"
 
-/* TOP BAR */
+        "grid";
+    align-items: center;
+    margin-top: 0;
+}
+.climad {
+        bottom: 0;
+        filter: drop-shadow(0 6px 10px rgba(255, 255, 255));
+        }
+
+/* Top Bar */
 .top-bar {
-    height: 8vh;
+    margin-top: 0;
+    width: 100%;
+    /* height: 75px; */
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    background: #2b2b2b;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.6);
+    background: #2d2d2d;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    grid-area: "top-bar";
+    color: #cccccc;
 }
 
 .top-item {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: calc(2.2 * var(--scale));
+    font-size: 24px;
     font-weight: 600;
-    color: #e0e0e0;
 }
 
-.logo {
-    height: 6vh;
+/* Clock Grid */
+.grid {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    height: calc(100%);
+    grid-area: "grid";
+
 }
 
-/* CLOCK LAYOUT */
-#clockContainer {
-    display: flex;
-    flex-direction: column;
-    gap: 4vh;
-    justify-content: center;
-    align-items: center;
-}
-
-/* ROWS */
-.clock-row {
-    display: flex;
-    justify-content: center;
-    gap: 4vw;
-}
-
-/* CONTAINERS */
 .clock-container {
     text-align: center;
+    margin-top: 100px;
+    margin-left: 100px;
+    margin-right: 100px;
 }
 
-/* SIZES */
-.clock-container.big canvas {
-    width: 26vh;
-    height: 26vh;
-}
-
-.clock-container.small canvas {
-    width: 18vh;
-    height: 18vh;
-}
-
-/* CANVAS */
 canvas {
-    background: #3a3a3a;
+    height: 300px;
+    background: #4c4c4c;
     border-radius: 50%;
-    box-shadow: 0 12px 28px rgba(0,0,0,0.7);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 }
 
-/* DIGITAL CLOCK */
-.digital-clock {
-    font-size: calc(4 * var(--scale));
-    font-weight: 600;
-    color: #f0f0f0;
-    background: #3a3a3a;
-    padding: 30px 40px;
-    border-radius: 15px;
-    box-shadow: 0 12px 28px rgba(0,0,0,0.7);
-    text-align: center;
-}
-
-.clock-container.small .digital-clock {
-    font-size: calc(3 * var(--scale));
-    padding: 20px 30px;
-}
-
-/* LABELS */
 .label {
-    margin-top: 1vh;
-    font-size: calc(2 * var(--scale));
+    color: #aaaaaa;
+    margin-top: 12px;
+    font-size: 24px;
     font-weight: 500;
-    color: #cfcfcf;
 }
 
-/* ETA */
-#eta {
+.digital-clock {
+    font-size: 48px;
+    margin-top: 100px;
+    font-weight: 600;
+    background: #aaaaaa;
+    color: #3c3c3c;
+    padding: 40px 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
     text-align: center;
-    padding: 1vh;
-    font-size: calc(1.8 * var(--scale));
-    color: #cfcfcf;
 }
 
-/* WEATHER */
+/* Weather Box */
 #weatherBox img {
-    height: 4vh;
+    vertical-align: middle;
+    height: 40px;
     margin-right: 8px;
-    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8));
 }
-
-/* ANIMATION */
-.animate {
-    opacity: 0;
-    transform: translateY(30px);
-    animation: fadeUp 1s ease forwards;
-}
-
-.animate:nth-child(1) { animation-delay: 0.2s; }
-.animate:nth-child(2) { animation-delay: 0.4s; }
-.animate:nth-child(3) { animation-delay: 0.6s; }
-.animate:nth-child(4) { animation-delay: 0.8s; }
-.animate:nth-child(5) { animation-delay: 1s; }
-
-@keyframes fadeUp {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* VERTICAL TV */
-@media (orientation: portrait) {
-    .clock-row {
-        flex-direction: column;
-        gap: 3vh;
-    }
-}
+#eta{
+            color: #aaaaaa;
+            padding-left:5px;
+        }
