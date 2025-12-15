@@ -164,7 +164,7 @@
         const digitalDiv = document.createElement('div');
         digitalDiv.className = 'digital-clock';
         const digitalLabel = document.createElement('div');
-        digitalLabel.className = 'label';
+        digitalLabel.className = labelText=='Portugal'|| labelText=='Espanha'?'labelbig':'label';
         digitalLabel.textContent = labelText;
         container.appendChild(digitalDiv);
         container.appendChild(digitalLabel);
