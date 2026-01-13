@@ -20,12 +20,12 @@
 
     <!-- LINHA DE CIMA -->
     <div class="clock-row-up">
-        <div class="clock-container big ptContainer" id="clock-ptContainer">
+        <div class="clock-container big ptContainer" onclick="portugalClick()" id="clock-ptContainer">
             <canvas id="clock-pt" width="300" height="300"></canvas>
             <div class="labelbig">Portugal</div>
         </div>
 
-        <div class="clock-container big esContainer" id="clock-esContainer">
+        <div class="clock-container big esContainer" onclick="spainClick()" id="clock-esContainer">
             <canvas id="clock-es" width="300" height="300"></canvas>
             <div class="labelbig">Espanha</div>
         </div>
@@ -81,6 +81,8 @@
     { id:'clock-pe', tz:'America/Lima', lb:'Perú' },
     { id:'clock-ar', tz:'America/Argentina/Buenos_Aires', lb:'Argentina' }
 ];
+
+
 
     function createAnalogClock(canvasId, timeZone) {
         const canvas = document.getElementById(canvasId);
@@ -180,12 +182,40 @@
         }
         updateClock();
     }
-
+function createClocks() {
     countries.forEach(c => {
         const containerId = c.id + 'Container';
         if (isDigital) createDigitalClock(containerId, c.tz, c.lb);
         else createAnalogClock(c.id, c.tz);
     });
+}
+    createClocks();
+
+    function portugalClick() 
+    {
+        var newUrl = "";
+        if(isDigital){
+            newUrl = window.location.href.toString().replace('digital=1', 'digital=0');
+        }
+        else{
+            newUrl = window.location.href.toString().replace('digital=0', 'digital=1');
+        }
+        console.log(newUrl);
+        window.location = newUrl;
+    }
+    function spainClick() 
+    {
+        var newUrl = "";
+        if(isDarkMode){
+            newUrl = window.location.href.toString().replace('darkMode=1', 'darkMode=0');
+        }
+        else{
+            newUrl = window.location.href.toString().replace('darkMode=0', 'darkMode=1');
+        }
+        console.log(newUrl);
+        window.location = newUrl;
+        reload();
+    }
 
     /********** Data **********/
     function updateDateBox() {
