@@ -194,11 +194,24 @@ function createClocks() {
     function portugalClick() 
     {
         var newUrl = "";
+        var currentUrl = window.location.href.toString();
         if(isDigital){
-            newUrl = window.location.href.toString().replace('digital=1', 'digital=0');
+            if( currentUrl.indexOf('digital=1') === -1 ){
+                if( currentUrl.indexOf('?') === -1 )
+                    currentUrl += '?digital=1';
+                else
+                currentUrl += '&digital=1';
+            }
+            newUrl = currentUrl.replace('digital=1', 'digital=0');
         }
         else{
-            newUrl = window.location.href.toString().replace('digital=0', 'digital=1');
+            if( currentUrl.indexOf('digital=0') === -1 ){
+                if( currentUrl.indexOf('?') === -1 )
+                    currentUrl += '?digital=0';
+                else
+                currentUrl += '&digital=0';
+            }
+            newUrl = currentUrl.replace('digital=0', 'digital=1');
         }
         console.log(newUrl);
         window.location = newUrl;
@@ -206,11 +219,24 @@ function createClocks() {
     function spainClick() 
     {
         var newUrl = "";
+        var currentUrl = window.location.href.toString();
         if(isDarkMode){
+            if( currentUrl.indexOf('darkMode=1') === -1 ){
+                if( currentUrl.indexOf('?') === -1 )
+                    currentUrl += '?darkMode=1';
+                else
+                currentUrl += '&darkMode=1';
+            }
             newUrl = window.location.href.toString().replace('darkMode=1', 'darkMode=0');
         }
         else{
-            newUrl = window.location.href.toString().replace('darkMode=0', 'darkMode=1');
+            if( currentUrl.indexOf('darkMode=0') === -1 ){
+                if( currentUrl.indexOf('?') === -1 )
+                    currentUrl += '?darkMode=0';
+                else
+                currentUrl += '&darkMode=0';
+            }
+            newUrl = currentUrl.replace('darkMode=0', 'darkMode=1');
         }
         console.log(newUrl);
         window.location = newUrl;

@@ -114,6 +114,7 @@
 
         .brContainer{
             grid-area: bras;
+            cursor: none;
         }
 
         
