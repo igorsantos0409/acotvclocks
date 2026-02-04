@@ -20,10 +20,12 @@
     <div id="clockContainer">
 
         <div class="showVideo" style="display: none;" id="videoDiv" onclick="videoClick()">
-            <video autoplay loop muted>
+            <!-- <video autoplay loop muted>
                 <source src="acoMovie.mp4" type="video/mp4">
                 Your browser does not support the video tag.
-            </video>
+            </video> -->
+            <!-- versão com o video do youtube com iframe sem controles e em loop https://www.youtube.com/JLyjd_MjBPQ -->
+            <iframe width="560" height="315" src="https://www.youtube.com/embed/JLyjd_MjBPQ?si=7t-iT1YHJeFrgJJK" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
         </div>
         <div class="showClocks">
             <!-- LINHA DE CIMA -->
@@ -84,18 +86,18 @@
 
         /********** Relógios **********/
         const countries = [
-            { id: 'clock-pt', tz: 'Europe/Lisbon', lb: 'Portugal' },
-            { id: 'clock-es', tz: 'Europe/Madrid', lb: 'Espanha' },
-            { id: 'clock-br', tz: 'America/Brasilia', lb: 'Brasil' },
-            { id: 'clock-cl', tz: 'America/Santiago', lb: 'Chile' },
-            { id: 'clock-co', tz: 'America/Bogota', lb: 'Colombia' },
-            { id: 'clock-pe', tz: 'America/Lima', lb: 'Perú' },
-            { id: 'clock-ar', tz: 'America/Argentina/Buenos_Aires', lb: 'Argentina' }
+            { id: 'clock-pt', lang: 'en-US' ,tz: 'Europe/Lisbon', lb: 'Portugal' },
+            { id: 'clock-es', lang: 'en-US' ,tz: 'Europe/Madrid', lb: 'Espanha' },
+            { id: 'clock-br', lang: 'pt-BR' ,tz: 'America/Sao_Paulo', lb: 'Brasil' },
+            { id: 'clock-cl', lang: 'en-US' ,tz: 'America/Santiago', lb: 'Chile' },
+            { id: 'clock-co', lang: 'en-US' ,tz: 'America/Bogota', lb: 'Colombia' },
+            { id: 'clock-pe', lang: 'en-US' ,tz: 'America/Lima', lb: 'Perú' },
+            { id: 'clock-ar', lang: 'en-US' ,tz: 'America/Argentina/Buenos_Aires', lb: 'Argentina' }
         ];
 
 
 
-        function createAnalogClock(canvasId, timeZone) {
+        function createAnalogClock(canvasId, timeZone, lang) {
             const canvas = document.getElementById(canvasId);
             const ctx = canvas.getContext("2d");
             const radius = canvas.height / 2;
@@ -110,7 +112,7 @@
 
             function getLocalDate() {
                 const now = new Date();
-                const localeString = now.toLocaleString("en-US", { timeZone });
+                const localeString = now.toLocaleString(lang, { timeZone });
                 return new Date(localeString);
             }
 
@@ -196,7 +198,7 @@
         function createClocks() {
             countries.forEach(c => {
                 const containerId = c.id + 'Container';
-                if (isDigital) createDigitalClock(containerId, c.tz, c.lb);
+                if (isDigital) createDigitalClock(containerId, c.tz, c.lb, c.lang);
                 else createAnalogClock(c.id, c.tz);
             });
         }
@@ -280,7 +282,7 @@
             }
         }
         updateWeather();
-        
+
         function videoClick() {
             const currentUrl = window.location.href.toString();
             let newUrl = "";
@@ -336,6 +338,7 @@
             }
             console.log(newUrl);
             window.location = newUrl;
+            reload();
         }
 
 
@@ -364,6 +367,5 @@
 
 
 </body>
-
 
 </html>
