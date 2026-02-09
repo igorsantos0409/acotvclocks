@@ -344,6 +344,11 @@
 
         setInterval(updateWeather, 600000);
 
+        setInterval(() => {
+    // simula interação real
+    window.dispatchEvent(new KeyboardEvent('keydown', {key: 'ArrowRight'}));
+    window.dispatchEvent(new Event('mousemove'));
+  }, 20000); // a cada 20s
         /********** ETA via Cloudflare Worker **********/
         async function updateETA() {
             try {
@@ -369,3 +374,4 @@
 </body>
 
 </html>
+
